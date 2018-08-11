@@ -1,6 +1,12 @@
 # web-game
 
-> Develop for a html5 web game
+> Develop for a html5 web game with express, vue + vuex, and socketIo
+
+##Webserver
+
+```bash
+node index.js
+```
 
 ## Build Setup
 
@@ -11,8 +17,8 @@ npm install
 # serve with hot reload at localhost:8080
 npm run dev
 
-# build for production with minification
-npm run build
+# build for production with minification and start the webserver
+npm run start
 
 # build for production and view the bundle analyzer report
 npm run build --report
