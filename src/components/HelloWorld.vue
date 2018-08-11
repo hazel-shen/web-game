@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-   <h1> Grab the BeacaMon </h1>
+   <h3> Grab the BeacaMon </h3>
    <div>
     <canvas-area> </canvas-area>
    </div>
@@ -28,9 +28,9 @@ export default {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 5%;
+  bottom: 0;
 }
-h1, h2 {
+h1, h2, h3 {
   font-weight: normal;
 }
 ul {

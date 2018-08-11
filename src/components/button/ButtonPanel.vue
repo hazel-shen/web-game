@@ -1,40 +1,47 @@
 <template>
   <div>
-      <button type="button" class="btn btn-info btn-circle btn-xl">
+      <button type="button"
+              class="btn btn-info btn-circle btn-xl"
+              @click="movePaddleToLeft">
         <span class="glyphicon glyphicon-arrow-left"></span>
       </button>
-      <button type="button" class="btn btn-info btn-circle btn-xl">
+      <button type="button"
+              class="btn btn-info btn-circle btn-xl">
         <span class="glyphicon glyphicon-screenshot"></span>
       </button>
-      <button type="button" class="btn btn-info btn-circle btn-xl">
+      <button type="button"
+              class="btn btn-info btn-circle btn-xl"
+              @click="movePaddleToRight">
         <span class="glyphicon glyphicon-arrow-right"></span>
       </button>
-        <p>{{ count }}</p>
-      <button @click="increment">+</button>
-      <button @click="decrement">-</button>
+        <p>{{ paddleX }}</p>
     </div>
 </template>
 <script>
-import { mapState, mapMutations } from 'vuex'
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
-      // count: this.$store.state.count
+      stepOfPaddle: 10
     }
   },
-  methods: {
-    ...mapMutations([
-      'increment',
-      'decrement'
+  computed: {
+    ...mapState([
+      'paddleX',
+      'count'
     ])
   },
-  computed: mapState({
-    count: state => state.count
-  })
+  methods: {
+    movePaddleToLeft () {
+      return this.$store.commit('setPaddleX', this.$store.state.paddleX - this.stepOfPaddle)
+    },
+    movePaddleToRight () {
+      return this.$store.commit('setPaddleX', this.$store.state.paddleX + this.stepOfPaddle)
+    }
+  }
 }
 </script>
 <style scoped>
-
 .btn-circle {
   width: 30px;
   height: 30px;
