@@ -6,7 +6,8 @@
         <span class="glyphicon glyphicon-arrow-left"></span>
       </button>
       <button type="button"
-              class="btn btn-info btn-circle btn-xl">
+              class="btn btn-info btn-circle btn-xl"
+              @click="setLaunch">
         <span class="glyphicon glyphicon-screenshot"></span>
       </button>
       <button type="button"
@@ -37,6 +38,9 @@ export default {
     },
     movePaddleToRight () {
       return this.$store.commit('setPaddleX', this.$store.state.paddleX + this.stepOfPaddle)
+    },
+    setLaunch () {
+      return this.$store.commit('setLaunch', true)
     }
   }
 }
