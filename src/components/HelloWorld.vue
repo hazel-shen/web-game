@@ -28,10 +28,11 @@ export default {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 5%;
 }
 h1, h2, h3 {
   font-weight: normal;
+  color: aliceblue;
 }
 ul {
   list-style-type: none;

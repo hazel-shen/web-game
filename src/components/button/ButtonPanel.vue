@@ -15,7 +15,6 @@
               @click="movePaddleToRight">
         <span class="glyphicon glyphicon-arrow-right"></span>
       </button>
-        <p>{{ paddleX }}</p>
     </div>
 </template>
 <script>

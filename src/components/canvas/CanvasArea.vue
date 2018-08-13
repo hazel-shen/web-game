@@ -16,14 +16,70 @@ export default {
     this.ballX = Math.floor(this.canvas.clientWidth / 2)
     this.ballY = this.canvas.clientHeight / 2
     this.ballInterval = setInterval(this.draw, 500)
-    // this.drawBeacaFood()
+    this.initFood()
     this.initPaddle()
   },
   methods: {
     draw () {
-      this.context.clearRect(this.ballX - 10, this.ballY - 10, 100, 100)
+      this.context.clearRect(this.ballX - 25, this.ballY - 25, 100, 100)
       this.drawBall()
-      if (this.ballX + this.dBallX > this.canvas.clientWidth || this.ballX + this.dBallX < 0) {
+      this.setBallWay()
+    },
+    drawBall () {
+      var ball = new Image()
+      ball.src = 'http://res.pokemon.name/common/pokemon/pgl/007.00.png'
+      var sourceX = 0
+      var sourceY = 0
+      var sourceWidth = ball.width - 1 // you're in the bounds
+      var sourceHeight = ball.height - 1
+      var destX = this.ballX
+      var destY = this.ballY
+      var destWidth = 50
+      var destHeight = 50
+
+      ball.onload = () => {
+        this.context.drawImage(ball, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight)
+      }
+    },
+    drawBeacaFood () {
+      this.foodInterval = setInterval(() => {
+        this.context.clearRect(this.foodX, this.foodY, 30, 30)
+        var food = new Image()
+        food.src = 'http://mail.wcjs.tc.edu.tw/~aher/uploads/tad_book3/image/scratch/pokemon-ball.png'
+        food.onload = () => {
+          this.context.drawImage(food, this.foodX, this.foodY, this.foodImageHeight, this.foodImageHeight)
+        }
+        this.isFoodCrush()
+        this.setFoodWay()
+        this.isEaten()
+      }, 500)
+    },
+    initFood () {
+      var food = new Image()
+      food.src = 'http://mail.wcjs.tc.edu.tw/~aher/uploads/tad_book3/image/scratch/pokemon-ball.png'
+      this.foodX = (this.canvas.clientWidth - this.foodImageHeight) / 2
+      this.foodY = this.canvas.clientHeight - this.foodImageHeight * 1.5
+      food.onload = () => {
+        this.context.drawImage(food, this.foodX, this.foodY, this.foodImageHeight, this.foodImageHeight)
+      }
+    },
+    initPaddle () {
+      var paddlePositionX = (this.canvas.clientWidth - this.paddleWidth) / 2
+      this.setPaddleX(paddlePositionX)
+      this.drawPaddle(paddlePositionX)
+    },
+    setFoodWay () {
+      if (this.foodX + this.dFoodX > this.canvas.clientWidth - this.foodImageHeight || this.foodX + this.dFoodX < 0) {
+        this.dFoodX = -this.dFoodX
+      } else if (this.foodY + this.dFoodY < 0 || this.foodY + this.dFoodY > this.canvas.clientHeight) {
+        this.dFoodY = -this.dFoodY
+      } else {
+        this.foodX += this.dFoodX
+        this.foodY += this.dFoodY
+      }
+    },
+    setBallWay () {
+      if (this.ballX + this.dBallX > this.canvas.clientWidth - this.ballImageHeight || this.ballX + this.dBallX < 0) {
         this.dBallX = -this.dBallX
       } else if (this.ballY + this.dBallY < 0 || this.ballY + this.dBallY > this.canvas.clientHeight - this.canvas.clientHeight * 0.5) {
         this.dBallY = -this.dBallY
@@ -31,45 +87,6 @@ export default {
         this.ballX += this.dBallX
         this.ballY += this.dBallY
       }
-    },
-    drawBall () {
-      console.log(this.ballY)
-      this.ball.src = 'http://res.pokemon.name/common/pokemon/pgl/007.00.png'
-      var sourceX = 0
-      var sourceY = 0
-      var sourceWidth = this.ball.width - 1 // you're in the bounds
-      var sourceHeight = this.ball.height - 1
-      var destX = this.ballX
-      var destY = this.ballY
-      var destWidth = 50
-      var destHeight = 50
-
-      this.ball.onload = () => {
-        this.context.drawImage(this.ball, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight)
-      }
-    },
-    drawBeacaFood () {
-      this.foodInterval = setInterval(() => {
-        this.context.clearRect(this.foodX - 10, this.foodY - 10, 30, 30)
-        this.food.src = 'http://mail.wcjs.tc.edu.tw/~aher/uploads/tad_book3/image/scratch/pokemon-ball.png'
-        this.food.onload = () => {
-          this.context.drawImage(this.food, this.foodX, this.foodY, 20, 20)
-        }
-        if (this.foodX + this.dFoodX > this.canvas.clientWidth || this.foodX + this.dFoodX < 0) {
-          this.dFoodX = -this.dFoodX
-        } else if (this.foodY + this.dFoodY < 0 || this.foodY + this.dFoodY > this.canvas.clientHeight) {
-          this.dFoodY = -this.dFoodY
-        } else {
-          this.foodX += this.dFoodX
-          this.foodY += this.dFoodY
-        }
-        this.isEaten()
-      }, 500)
-    },
-    initPaddle () {
-      var paddlePositionX = (this.canvas.clientWidth - this.paddleWidth) / 2
-      this.setPaddleX(paddlePositionX)
-      this.drawPaddle(paddlePositionX)
     },
     drawPaddle (paddlePositionX) {
       this.context.clearRect(0, this.canvas.clientHeight - this.paddleHeight, this.canvas.clientWidth, this.paddleHeight)
@@ -82,13 +99,30 @@ export default {
     setPaddleX (paddleX) {
       return this.$store.commit('setPaddleX', paddleX)
     },
-    isEaten () {
-      console.log(this.foodX + ' ' + this.foodY + ' ' + this.ballX + ' ' + this.ballY)
-      if (this.foodX > this.ballX - 50 && this.foodX < this.ballX + 50 && this.foodY > this.ballY - 50 && this.foodY < this.ballY + 50) {
-        alert('Eaten!')
-        clearInterval(this.foodInterval)
-        clearInterval(this.ballInterval)
+    isFoodCrush () {
+      if (this.foodX > this.$store.state.paddleX - this.paddleWidth/2 && 
+          this.foodX < this.$store.state.paddleX + this.paddleWidth &&
+          this.foodY === this.canvas.clientHeight - this.foodImageHeight*1.5) {
+        this.dFoodY = -this.dFoodY                              
+      } else if (
+      (this.foodX < this.$store.state.paddleX || this.foodX > this.$store.state.paddleX + this.paddleWidth) &&
+      this.foodY > this.canvas.clientHeight - this.foodImageHeight*1.5) {
+        this.clearAllIntervals()
+        alert('crush')            
       }
+    },
+    isEaten () {
+      if (this.foodX > this.ballX - this.eatDistance &&
+          this.foodX < this.ballX + this.eatDistance &&
+          this.foodY > this.ballY - this.eatDistance &&
+          this.foodY < this.ballY + this.eatDistance) {
+        this.clearAllIntervals()
+        alert('Eaten!')        
+      }
+    },
+    clearAllIntervals () {
+      clearInterval(this.foodInterval)
+      clearInterval(this.ballInterval)
     }
   },
   computed: {
@@ -100,10 +134,12 @@ export default {
   },
   watch: {
     'paddleX': function (e) {
-      console.log(e)
       this.drawPaddle(e)
     },
     'isLaunch': function () {
+      this.context.clearRect(this.foodX, this.foodY, 30, 30)      
+      this.foodX += this.dFoodX
+      this.foodY += this.dFoodY
       this.drawBeacaFood()
     }
   },
@@ -111,8 +147,8 @@ export default {
     return {
       ballInterval: {},
       foodInterval: {},
-      ball: new Image(),
-      food: new Image(),
+      ballImageHeight: 30,
+      foodImageHeight: 30,
       paddleHeight: 10,
       paddleWidth: 60,
       foodHeight: 10,
@@ -120,12 +156,13 @@ export default {
       ballRadius: 10,
       ballX: 0,
       ballY: 0,
-      dBallX: 4,
-      dBallY: -4,
+      dBallX: 25,
+      dBallY: -25,
       foodX: 30,
       foodY: 40,
-      dFoodX: 8,
-      dFoodY: -8,
+      dFoodX: 20,
+      dFoodY: -20,
+      eatDistance: 15,
       canvas: {},
       context: {}
     }
@@ -139,5 +176,6 @@ canvas {
   margin: auto;
   top: 20%;
   border:  2px solid black;
+  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOzgjOO1ujShtqjvN_7h0i2KWzIAgw4e7wlA_dLivT8JEShxMl');
 }
 </style>
