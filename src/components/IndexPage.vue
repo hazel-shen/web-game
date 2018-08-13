@@ -4,6 +4,7 @@
    <div>
     <canvas-area> </canvas-area>
    </div>
+    <liff />
     <buttonPanel id="buttonPanel"/>
   </div>
 </template>
@@ -11,12 +12,14 @@
 <script>
 import ButtonPanel from './button/ButtonPanel'
 import CanvasArea from './canvas/CanvasArea'
+import Liff from './Liff'
 export default {
   components: {
     ButtonPanel,
-    CanvasArea
+    CanvasArea,
+    Liff
   },
-  name: 'HelloWorld'
+  name: 'IndexPage'
 }
 </script>
 

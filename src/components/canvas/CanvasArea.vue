@@ -6,20 +6,37 @@
    </div>
 </template>
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 export default {
   mounted () {
     this.canvas = this.$refs.canvas
     this.context = this.$refs.canvas.getContext('2d')
     this.context.canvas.width = window.innerWidth * 0.8
     this.context.canvas.height = window.innerHeight * 0.6
-    this.ballX = Math.floor(this.canvas.clientWidth / 2)
-    this.ballY = this.canvas.clientHeight / 2
-    this.ballInterval = setInterval(this.draw, 500)
+    this.initBall()
     this.initFood()
     this.initPaddle()
   },
   methods: {
+    initBall () {
+      this.ballX = Math.floor(this.canvas.clientWidth / 2)
+      this.ballY = this.canvas.clientHeight / 2
+      this.ballInterval = setInterval(this.draw, 500)
+    },
+    initFood () {
+      var food = new Image()
+      food.src = 'http://mail.wcjs.tc.edu.tw/~aher/uploads/tad_book3/image/scratch/pokemon-ball.png'
+      this.foodX = (this.canvas.clientWidth - this.foodImageHeight) / 2
+      this.foodY = this.canvas.clientHeight - this.foodImageHeight * 1.5
+      food.onload = () => {
+        this.context.drawImage(food, this.foodX, this.foodY, this.foodImageHeight, this.foodImageHeight)
+      }
+    },
+    initPaddle () {
+      var paddlePositionX = (this.canvas.clientWidth - this.paddleWidth) / 2
+      this.setPaddleX(paddlePositionX)
+      this.drawPaddle(paddlePositionX)
+    },
     draw () {
       this.context.clearRect(this.ballX - 25, this.ballY - 25, 100, 100)
       this.drawBall()
@@ -43,7 +60,7 @@ export default {
     },
     drawBeacaFood () {
       this.foodInterval = setInterval(() => {
-        this.context.clearRect(this.foodX, this.foodY, 30, 30)
+        this.context.clearRect(this.foodX, this.foodY, 35, 30)
         var food = new Image()
         food.src = 'http://mail.wcjs.tc.edu.tw/~aher/uploads/tad_book3/image/scratch/pokemon-ball.png'
         food.onload = () => {
@@ -53,20 +70,6 @@ export default {
         this.setFoodWay()
         this.isEaten()
       }, 500)
-    },
-    initFood () {
-      var food = new Image()
-      food.src = 'http://mail.wcjs.tc.edu.tw/~aher/uploads/tad_book3/image/scratch/pokemon-ball.png'
-      this.foodX = (this.canvas.clientWidth - this.foodImageHeight) / 2
-      this.foodY = this.canvas.clientHeight - this.foodImageHeight * 1.5
-      food.onload = () => {
-        this.context.drawImage(food, this.foodX, this.foodY, this.foodImageHeight, this.foodImageHeight)
-      }
-    },
-    initPaddle () {
-      var paddlePositionX = (this.canvas.clientWidth - this.paddleWidth) / 2
-      this.setPaddleX(paddlePositionX)
-      this.drawPaddle(paddlePositionX)
     },
     setFoodWay () {
       if (this.foodX + this.dFoodX > this.canvas.clientWidth - this.foodImageHeight || this.foodX + this.dFoodX < 0) {
@@ -99,25 +102,34 @@ export default {
     setPaddleX (paddleX) {
       return this.$store.commit('setPaddleX', paddleX)
     },
+    setMessage (message) {
+      return this.$store.commit('setMessage', message)      
+    },
     isFoodCrush () {
-      if (this.foodX > this.$store.state.paddleX - this.paddleWidth/2 && 
-          this.foodX < this.$store.state.paddleX + this.paddleWidth &&
-          this.foodY === this.canvas.clientHeight - this.foodImageHeight*1.5) {
-        this.dFoodY = -this.dFoodY                              
-      } else if (
-      (this.foodX < this.$store.state.paddleX || this.foodX > this.$store.state.paddleX + this.paddleWidth) &&
-      this.foodY > this.canvas.clientHeight - this.foodImageHeight*1.5) {
+      if (Math.abs(this.foodX - this.$store.state.paddleX) < (this.paddleWidth + this.foodWidth) &&
+          this.foodY === this.canvas.clientHeight - this.foodImageHeight * 1.5) {
+        this.dFoodY = -this.dFoodY
+      } else if ((this.foodX < this.$store.state.paddleX || this.foodX > this.$store.state.paddleX + this.paddleWidth) &&
+      this.foodY > this.canvas.clientHeight - this.foodImageHeight * 1.5) {
         this.clearAllIntervals()
-        alert('crush')            
+        var lostImage = new Image()
+        lostImage.src = 'http://m1.aboluowang.com/uploadfile/2014/0914/20140914075559982.jpg'
+        lostImage.onload = () => {
+          this.context.drawImage(lostImage, 0, 0, this.canvas.clientWidth, this.canvas.clientHeight)          
+        }
+        this.setMessage('Lost the ball !')    
+        this.$store.commit('increment')    
       }
     },
     isEaten () {
-      if (this.foodX > this.ballX - this.eatDistance &&
-          this.foodX < this.ballX + this.eatDistance &&
-          this.foodY > this.ballY - this.eatDistance &&
-          this.foodY < this.ballY + this.eatDistance) {
+      if (Math.abs(this.foodX - this.ballX) < this.eatDistance && Math.abs(this.foodY - this.ballY) < this.eatDistance) {
         this.clearAllIntervals()
-        alert('Eaten!')        
+        var beacaMon = new Image()
+        beacaMon.src = 'http://pa1.narvii.com/5828/f036dc936d64ecd9e6dac043824292622aeb700d_hq.gif'
+        beacaMon.onload = () => {
+          this.context.drawImage(beacaMon, 0, 0, this.canvas.clientWidth, this.canvas.clientHeight)
+        }
+        this.setMessage('Gotcha !')
       }
     },
     clearAllIntervals () {
@@ -136,11 +148,20 @@ export default {
     'paddleX': function (e) {
       this.drawPaddle(e)
     },
-    'isLaunch': function () {
-      this.context.clearRect(this.foodX, this.foodY, 30, 30)      
-      this.foodX += this.dFoodX
-      this.foodY += this.dFoodY
-      this.drawBeacaFood()
+    'isLaunch': function (isLaunch) {   
+      if (!isLaunch) {
+        this.setMessage('Start !')
+        this.clearAllIntervals() 
+        this.context.clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight)               
+        this.initBall()
+        this.initFood()
+        this.initPaddle()
+      } else {
+        this.context.clearRect(this.foodX, this.foodY, 30, 30)
+        this.foodX += this.dFoodX
+        this.foodY += this.dFoodY
+        this.drawBeacaFood()
+      }
     }
   },
   data () {
@@ -162,7 +183,7 @@ export default {
       foodY: 40,
       dFoodX: 20,
       dFoodY: -20,
-      eatDistance: 15,
+      eatDistance: 40,
       canvas: {},
       context: {}
     }

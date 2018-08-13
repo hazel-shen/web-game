@@ -15,6 +15,7 @@
               @click="movePaddleToRight">
         <span class="glyphicon glyphicon-arrow-right"></span>
       </button>
+      <button @click="send">send Message </button>
     </div>
 </template>
 <script>
@@ -23,12 +24,14 @@ export default {
   data () {
     return {
       stepOfPaddle: 10
+      
     }
   },
   computed: {
     ...mapState([
       'paddleX',
-      'count'
+      'count',
+      'isLaunch'
     ])
   },
   methods: {
@@ -39,7 +42,21 @@ export default {
       return this.$store.commit('setPaddleX', this.$store.state.paddleX + this.stepOfPaddle)
     },
     setLaunch () {
-      return this.$store.commit('setLaunch', true)
+      return this.$store.commit('setLaunch', !this.$store.state.isLaunch)
+    },
+    send() {
+      liff.sendMessages([
+        {
+          type:'text',
+          text:'恭喜捕獲神奇寶貝!'
+        }
+      ])
+      .then(() => {
+        console.log('message sent')
+      })
+      .catch((err) => {
+        console.log('error', err)
+      })
     }
   }
 }

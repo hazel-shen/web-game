@@ -7,7 +7,8 @@ export default new Vuex.Store({
 	state: {
 		count: 0,
 		paddleX: 0,
-		isLaunch: false
+		isLaunch: false,
+		message: '',
 	},
 	mutations: {
 		increment: state => state.count++,
@@ -17,6 +18,9 @@ export default new Vuex.Store({
 		},
 		setLaunch (state, isLaunch) {
 			state.isLaunch = isLaunch
+		},
+		setMessage (state, message) {
+			state.message = message
 		}
 	},
 	getters: {
